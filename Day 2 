@@ -1,0 +1,109 @@
+############################### jour 2 #################################
+
+Comprendre docker et docker-compose 
+***********************************
+
+Qu'est-ce que docker ? 
+**********************
+
+C'est une solution open source, apportant sécurité et économie de ressource.
+C'est aussi un écosystème de produits, de services et ressources développés par la grande communauté Docker. 
+Initialement, il a été conçu pour Linux et permet la prise main des containers sur des système telle que Windows ou 
+MacOs grâce à une "couche" de virtualisation Linux entre le système d'exploitation
+et l'environnement runtime Docker (composant permettant d'executer les conteneurs sur le système d'exploitation hôte).
+En d'autres mots, docker offre la possibilité d'exécuter des conteneurs Windows/MacOs/Linux natifs sur des environnements de conteneurs Linux/Windows/MacOs. 
+
+
+De quoi docker est-il composé ? 
+*******************************
+
+Docker Engine:
+
+C'est (le moteur du système Docker) l'application qu'il faut installer
+sur sa machine hôte qui permet de créer, exécuter et gérer les 
+conteneurs Docker. L'engine regroupe et lie les diffèrents élèments entre eux.
+
+Il exite deux versions de Docker Engine: Docker Engine Enterprise (version payant avec une gestion de cluster), 
+et Docker Engine community (version d'origine et open source). 
+  
+PS. Le terme communément utiliser Docker, désigne le Docker Engine. 
+
+Docker Daemon:
+
+Le Docker Daemon (démon Docker) est processus en arrière-plan qui exécute les commandes
+envoyées par le Docker Client en communiquant via API REST pour gérer les conteneurs, les images, les volumes et les réseaux. 
+  
+En bref, c'est le "cerveau" qui exécute réellement les tâches Docker en arrière-plan.
+
+Docker Client: 
+
+C'est l'interface principale qui permet de communiquer avec le système Docker en recevant les commandes 
+via l'interface (CLI) et les transmet au Docker Daemon.
+
+En bref, le Docker Client est l'outil en ligne de commande (CLI) qui permet aux utilisateurs d'interagir avec Docker.
+
+Dockerfile: 
+
+C'est un fichier rédiger dans une syntaxe compréhensible, dans lequel se trouve des instructions de création d'image Docker.
+Dans ce fichier est indiqué le système d'exploitation sur lequel sera basé le conteneur, les langages utiles, les variables
+d'environnements, l'emplacements de ces fichiers, les ports réseaux ainsi que d'autres composant requis. 
+
+En bref, un Dockerfile est un fichier texte contenant une série d'instructions permettant de construire une image Docker.
+
+Image Docker: 
+
+Elle représente un modèle autonome léger en lecture seule, utiliser pour créer des conteneurs Docker.
+Cet image est constitué de plusieurs couches (dépendances, bibliothèques, processus et codes d'application nécessaires).
+ 
+En bref, une image Docker est comme un plan prêt à l’emploi pour exécuter une application de manière fiable et reproductible.
+
+Conteneur Docker: 
+
+Aussi appeler instance d'iamge, cela signifie qu'une image a été démarrée et fonctionne. Lorsqu'une image Docker est exécutée,
+Docker crée une instance (conteneur) de cette image. 
+Ce conteneur est une instance de l'image et a son propre système de fichiers, ses processus et son réseau.
+
+En bref, le conteneur est une version active et modifiable de d'une image, qui s'exécute et où les changements peuvent être 
+effectués (dans une espace temporaire).
+
+Qu'est ce que Docker Compose ? 
+******************************
+
+Docker Compose permet l'orchestration de plusieurs conteneurs et simplifie les déploiements sur plusieurs environnements. 
+C'est un outil écrit en Python qui permet de décrire, dans un fichier YAML, plusieurs conteneurs comme un ensemble de services.
+
+Commande Docker: 
+
+****** Mise à jour et installation de Docker Compose ******
+
+$ sudo apt-get update
+$ sudo apt-get install docker-compose-plugin
+
+****** Déploiement initial *******
+
+/// $ docker-compose up ///
+
+Cette commande construit les conteneurs ainsi que les objets définis dans le 
+fichier docker-compose écrit en YAML et démarre les services. 
+
+
+/// $ docker-compose down ///
+
+Arrête les services et les conteneurs 
+
+
+/// $ docker-compose restart ///
+
+Redémarre les services 
+
+
+/// $ docker-compose ps /// 
+
+Affiche les informations sur les conteneurs en cours d'exécution 
+
+
+/// $ docker-compose logs <nom-du-service> /// 
+
+Affiche les fichiers journaux (logs) peut être util en cas de problème et ou d'anomalie
+
+#############################################################
