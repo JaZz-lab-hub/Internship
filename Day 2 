@@ -7,15 +7,19 @@ Qu'est-ce que docker ?
 **********************
 
 C'est une solution open source, apportant sécurité et économie de ressource.
-C'est aussi un écosystème de produits, de services et ressources développés par la grande communauté Docker. 
-Initialement, il a été conçu pour Linux et permet la prise main des containers sur des système telle que Windows ou 
-MacOs grâce à une "couche" de virtualisation Linux entre le système d'exploitation
+C'est aussi un écosystème de produits, de services et de ressources développés par la grande communauté Docker. 
+Initialement, docker a été conçu pour Linux et permet la prise en main des containeurs sur des système tels que Windows ou 
+MacOs, Linux grâce à une "couche" de virtualisation basé sur Linux entre le système d'exploitation
 et l'environnement runtime Docker (composant permettant d'executer les conteneurs sur le système d'exploitation hôte).
-En d'autres mots, docker offre la possibilité d'exécuter des conteneurs Windows/MacOs/Linux natifs sur des environnements de conteneurs Linux/Windows/MacOs. 
-
+En d'autres mots, docker offre la possibilité d'exécuter des conteneurs Windows/MacOs/Linux natifs sur des environnements hôtes Linux/Windows/MacOs. 
+Ces points forts sont la facilité de création, de test, de déploiement et la gesion d'applications conteneurisées dans un 
+environnement cohérent, portable ou virtuel tel qu'un VPS (virtual private server).
 
 De quoi docker est-il composé ? 
 *******************************
+
+L'architecture Docker se compose de 6 composants clés que sont l'Engine, le Daemon, le Client, le Conteneur,
+l'Image et le Registre. L'élément  nécessaire à la création d'un conteneur est le Dockerfile.   
 
 Docker Engine:
 
@@ -30,8 +34,9 @@ PS. Le terme communément utiliser Docker, désigne le Docker Engine.
 
 Docker Daemon:
 
-Le Docker Daemon (démon Docker) est processus en arrière-plan qui exécute les commandes
-envoyées par le Docker Client en communiquant via API REST pour gérer les conteneurs, les images, les volumes et les réseaux. 
+Le Docker Daemon (démon Docker) est un  processus en arrière-plan qui exécute les commandes
+envoyées par le Docker Client en communiquant via API REST pour gérer les conteneurs, les images
+les volumes et les réseaux. 
   
 En bref, c'est le "cerveau" qui exécute réellement les tâches Docker en arrière-plan.
 
@@ -70,40 +75,228 @@ Qu'est ce que Docker Compose ?
 ******************************
 
 Docker Compose permet l'orchestration de plusieurs conteneurs et simplifie les déploiements sur plusieurs environnements. 
-C'est un outil écrit en Python qui permet de décrire, dans un fichier YAML, plusieurs conteneurs comme un ensemble de services.
-
-Commande Docker: 
-
-****** Mise à jour et installation de Docker Compose ******
-
-$ sudo apt-get update
-$ sudo apt-get install docker-compose-plugin
-
-****** Déploiement initial *******
-
-/// $ docker-compose up ///
-
-Cette commande construit les conteneurs ainsi que les objets définis dans le 
-fichier docker-compose écrit en YAML et démarre les services. 
+C'est un outil écrit en Python et qui permet de décrire, dans un fichier YAML, plusieurs conteneurs comme un ensemble de services.
 
 
-/// $ docker-compose down ///
-
-Arrête les services et les conteneurs 
-
-
-/// $ docker-compose restart ///
-
-Redémarre les services 
+Docker utilise plusieurs types de commande pour gérer les services, images et les conteneurs. Ces commandes 
+peuvent avoir des variantes.  
 
 
-/// $ docker-compose ps /// 
 
-Affiche les informations sur les conteneurs en cours d'exécution 
+cheat sheet
+***********
 
 
-/// $ docker-compose logs <nom-du-service> /// 
+Voici un cheat sheet de ces commandes : 
+ 
 
-Affiche les fichiers journaux (logs) peut être util en cas de problème et ou d'anomalie
+****** Commande de mise à jour & installation  ******
 
-#############################################################
+
+/// $ sudo apt-get update ///
+- Mise à jour du système
+
+/// $ sudo apt-get install docker compose-plugin ///
+- Installation de docker-compose
+
+
+****** / Commande de déploiement /   *******
+
+
+/// $ docker compose up ///
+- Cette commande construit les conteneurs ainsi que les objets définis dans le 
+  fichier docker-compose écrit en YAML et démarre les services. 
+
+/// $ docker compose down ///
+- Arrête les services et les conteneurs 
+
+/// $ docker compose restart ///
+- Redémarre les services 
+
+/// $ docker compose ps /// 
+- Affiche les informations sur les conteneurs en cours d'exécution (l'état) 
+
+/// $ docker compose logs <nom-du-service> /// 
+- Affiche les fichiers journaux (logs) peut être util en cas de problème et ou d'anomalie
+
+
+***** / Commande de création d'image / *****
+
+
+/// $ docker build /// 
+- Crée une image à partrir d'un Dockerfile dans le répertoire courant 
+
+/// $ docker build https://github.com/docker/rootsfs.git#contain:docker ///
+- Crée une image à partir d'un dépot distant Git 
+
+
+***** / Commande de néttoyage / *****
+
+
+/// $ docker image prune ///
+- Efface une image inutilisée (ce qu'il y a dans l'image est effacé)
+
+/// $ docker system prune ///
+- Supprime tous les conteneurs arrêtés, tous les réseaux non utilisés par les conteneurs,
+  toutes les images suspendues et tout le cache de construction 
+
+/// $ docker image rm image ///
+- Supprime une image
+
+/// $ docker rm container /// 
+- Supprime un conteneur en cours d'exécution
+
+/// $ docker kill ///
+- Supprime tous les conteneurs en cours d'exécution  
+
+
+***** / Commande d'interaction avec le conteneurs / *****
+
+
+/// $ docker create image ///
+- Crée un nouveau conteneur à partir d'une image 
+
+/// $ docker commit container image ///
+- Crée une nouvelle image à partir d'un conteneur  
+
+/// $ docker start container /// && /// $ docker restart container ///  
+- "Commence" un nouveau conteneur && "Recommence" un conteneur 
+
+/// $ docker stop container /// 
+- Arrête un conteneur 
+
+/// $ docker pause container /// 
+- Met en pause un conteneur
+
+/// $ docker wait container ///
+- Bloque un container 
+
+/// $ docker export container ///
+- Exporte le contenu du conteneur vers une archive tar 
+
+/// $ docker commit -m "commit message" -a "author" container username/image_name: tag ///
+- Sauvegarde un conteneur en cours d'exécution sous forme d'image 
+
+/// $ docker logs -ft container /// 
+- Suit les journaux des conteneurs
+
+/// $ docker commit container script.sh /// 
+- Exécute une commande dans un conteneur
+
+
+***** / Commande d'inspection de commande / *****
+
+
+/// $ docker compose ps /// 
+- Répertorie tous les conteneurs en cours d'exécution (l'état)
+
+/// $ docker -ps -a ///
+- Répertorie tous les conteneurs (-a : all) 
+
+/// $ docker diff container ///
+- Inspecte les modifications apportées aux répertoires et 
+  aux fichiers dans le système de fichier du conteneur 
+
+/// $ docker top container /// 
+- Montre tous les processus en cours d'exécution dans un conteneurs existant 
+
+/// $ docker inspect container /// 
+- Affiche des informations de bas niveau sur un conteneur 
+
+/// $ docker logs container ///
+- Rassemble les journaux pour un conteneur 
+
+/// $ docker stats container /// 
+- Affiche les statistique d'utilisation des ressources du conteneur 
+
+
+***** / Commande de gestion d'image / *****
+
+
+/// $ docker image ls /// 
+- Liste les images 
+
+/// $ docker image rm <name_of_the_image> ///
+- Supprime une image 
+
+/// $ docker tag image tag ///
+- Balise une image 
+
+/// $ docker history image /// 
+- Affiche l'historique d'une image
+
+/// $ docker inspect image ///
+- Affiche les informations de bas nieau sur une image 
+
+
+***** / Commande d'execution / *****
+
+
+/// $ docker run (option) image (command) (arg...) /// 
+- Docker utilise la commande run pour créer les conteneurs à partir d'images
+  Ceci est la syntax par défaut 
+
+
+***** / Commande du registre / ***** 
+
+
+/// $ docker login ///  &&  /// $ docker logout ///  
+- Permet de se connecter à un registre / Se deconnecter à un registre  
+
+/// $ docker pull <mysql> ///
+- Extrait une image d'un registre 
+
+/// $ docker push repo/ rhel- http:latest /// 
+- Envoie une image vers un registre 
+
+
+***** / Commande de service / *****
+
+
+/// $ docker service ls /// 
+- Liste tous les services en cours dans un essaim (noeud) 
+
+/// $ docker service ps <service_name>  /// 
+- Liste les tâches d'un service
+
+/// $ docker service update <service_name> ///
+- Met à jour un service
+
+/// $ docker service logs stackname <service_name> ///
+- Liste tous les journaux d'un service 
+
+
+***** / Commande réseau / ***** 
+
+
+/// $ docker network create <network_name> ///
+- Crée un nouveu réseau docker 
+
+/// $ docker network rm <network_name> ///
+- Supprime un réseau spécifique 
+
+/// $ docker network ls ///
+- Liste tous les réseaux 
+
+/// $ docker network connect <network_name> container ///
+- Connecte un conteneur à un réseau 
+
+/// $ docker network disconnect <network_name> container /// 
+- Déconnecte un conteneur d'un réseau
+
+/// $ docker network inspect <network_name> ///
+- Affiche des informations détaillées sur un réseau
+
+
+
+*********************************************************************************************************************
+
+
+En conclusion docker est un outil util pour toute personne souhaitant travailler de manière sécuriser et légère. 
+L'apprentissage de cet outil peut être complexe, particulièrement si l'on n'est pas familliariser à la contenerisation
+C'est donc pour cette raison qu'il me semble important et nécessaire d'avoir un cheat sheet des commandes Docker, que 
+l'on aie ou pas l'habitude d'utiliser des conteneurs.
+
+
+   
+######################################################################################################################
