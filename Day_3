@@ -1,0 +1,27 @@
+
+################################## Day 3 ####################################
+
+Familiarisation avec le Git branching
+*************************************
+
+
+Qu'est-ce que le Git branching : 
+
+Le branching (gestion des branches) est une fonctionnalité essentielle de Git qui permet de travailler 
+sur différentes versions d’un projet en parallèle. Une branche est une copie indépendante du projet sur
+laquelle on peut expérimenter ou développer de nouvelles fonctionnalités sans affecter la version 
+principale (nommé main ou master).
+
+lorsque l'on crée une branche, Git ne duplique pas tous les fichiers mais pointe simplement vers le dernier
+commit de la branche actuelle. On peut ensuite faire des modifications et les enregistrer avec des commits, 
+qui seront isolés dans cette branche tant qu’ils ne sont pas fusionnés avec la branche principale.
+
+Pour travailler avec une branche, on commence par la créer avec [git branch le nom de la branche], puis on
+bascule dessus avec [git checkout le nom de la branche] ou [git switch le nom de la branche].
+Une fois que le travail est terminé et testé, on peut fusionner cette branche avec la branche principale
+en exécutant [git checkout main] suivi de [git merge le nom de la branche].
+
+L’utilisation des branches permet d'éviter d’introduire d'erreurs dans la version stable d’un projet. 
+Elle permet aussi à plusieurs personnes de travailler en parallèle sur différentes fonctionnalités d'un projet 
+sans se gêner mutuellement. Une fois la fusion effectuée et si la branche n’est plus nécessaire, 
+on peut la supprimer avec [git branch -d le nom de la branche] pour garder le dépôt propre.
