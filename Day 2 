@@ -1,6 +1,9 @@
-############################### jour 2 #################################
+############################### Week one #################################
 
-Comprendre docker et docker-compose 
+Le but de cette première semaine est de me familiarisé avec docker et docker compose, comprendre ce qu'ils 
+apportent de positif aux développeurs et offrir un résumé des commandes les plus utiles. 
+
+ Docker et docker-compose 
 ***********************************
 
 Qu'est-ce que docker ? 
