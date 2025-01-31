@@ -1,5 +1,9 @@
 
-################################## Day 3 ####################################
+################################## Week one (part2) ####################################
+
+Cette deuxième partie ce focalise sur Git et son branching pour  
+comprendre ce que Git implique ainsi que les notions de dépôts locaux ou distants.  
+
 
 Familiarisation avec le Git branching
 *************************************
@@ -12,7 +16,7 @@ sur différentes versions d’un projet en parallèle. Une branche est une copie
 laquelle on peut expérimenter ou développer de nouvelles fonctionnalités sans affecter la version 
 principale (nommé main ou master).
 
-lorsque l'on crée une branche, Git ne duplique pas tous les fichiers mais pointe simplement vers le dernier
+Lorsque l'on crée une branche, Git ne duplique pas tous les fichiers mais pointe simplement vers le dernier
 commit de la branche actuelle. On peut ensuite faire des modifications et les enregistrer avec des commits, 
 qui seront isolés dans cette branche tant qu’ils ne sont pas fusionnés avec la branche principale.
 
