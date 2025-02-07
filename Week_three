@@ -1,0 +1,139 @@
+################################### Week three #####################################
+
+Ce fichier a pour but de comprendre et expliquer ce qu'est un Dockerfile, comment est-il 
+utilisé et de quoi est-il composé. 
+
+Qu'est ce qu'un Dockerfile 
+**************************
+
+C'est un fichier clé rédigé en texte brut dans une syntaxe simple et compréhensible. Dans ce fichier se trouve
+des instructions (e.g. FROM, WORKDIR, RUN, COPY, EXPOSE, CMD) définissant les détails des actions qui permetent d'automatiser la création d'une image docker, il contient aussi des arguments et des commentaires. Chaque ligne du Dockerfile est une instruction ayant des détails qui précise l'action à exécuter pour configurer une image. Ces éléments décrivent la structure de la future image.
+
+
+ex: # Commentaire 
+    INSTRUCTION argument1 argument2
+
+   
+	 ___
+ex:  	|   `___                    ________ 			__________
+	|	|		   | /\   * |			||||||||||
+	|	| ===============> |/  \/\  | ================> ||||||||||  
+	|_______|		   |________|			¨¨¨¨¨¨¨¨¨¨
+	Dockerfile		     Image			Conteneur
+
+
+
+Pour qu'un Dockerfile soit valide, il doit commencer  une instruction FROM.
+Elle définit l'image de base.
+
+# Doit apparaître comme la première instruction/ si on omet le tag, le générateur suppose que l'on veut récupérer l'image possédant le tag latest.
+ 
+# FROM permet d'indiquer sur quelle image de base on construit l'image.
+FROM <image> [:<tag>] (Définit l'image de base)
+
+Attention
+
+L’utilisation d’image source possédant le tag latest est fortement déconseillé. Rien ne garantit que sil'on lance à plusieurs reprises la construction d’une image à partir d’un Dockerfile contenant une instruction FROM sans valeurs tag ou digest,on obtienne le même résultat. Il suffit qu’entre deux exécutions cette image possédant cette balise latest ait été mise à jour pour que le résultat obtenu soit différent. La meilleure des pratiques est d’utiliser un digest.
+  
+ex: FROM nginx:1.15.3-alpine@sha256:829a63ad2b1389e393e5decf5df25860347d09643c335d1dc3d91d25326d3067
+
+
+# Déclare les paramètres qui vont être utiliser avec l'instruction RUN qui suit et peut apparaître avant le FROM. 
+ARG <name>[=default value]
+ou 
+ARG version=1.15.3-alpine@sha256:829a63ad2b1389e393e5decf5df25860347d09643c335d1dc3d91d25326d3067
+ou 
+ARG prenom=John 
+# l'instruction qui suit sera du type "RUN echo $prenom".
+
+
+# LABEL permet l'ajout de métatonnée (information) à l'image sous forme de clés/valeurs.
+LABEL <key>=<value> <key>=<value> <key>=<value> ...
+ou 
+LABEL version="1.0" 
+LABEL description="une image pour tester"
+
+
+# ENV Définit et gére les variables d’environnement pour le build process et le container runtime.
+# Une variable d'environnement est une variable disponible de puis n'importe quel endroit dans notre machine.
+ENV <key>=<value> ...
+ou
+# Cette variable indique l'emplacement du répertoire qui contient les fichiers de données de base de données (PostgreSQL).
+ENV PGDATA=/data 
+
+
+# COPY, permet de copier des fichiers ou des dossiers depuis le contexte de build (le dossier où l'on exécute la commande docker build) vers le système de fichiers de l'image.
+
+# copie d'un fichier depuis la machine hôte vers le répertoire "/app" qui est le répertoire de travail.
+COPY mon_fichier.txt /app/mon_fichier.txt
+ou 
+# copie d'un répertoire entier dans une image.
+COPY dossier /app/dossier
+ou 
+# copie de plusieurs fichiers et definition du propriétaire.
+COPY --chown=appuser:appgroup fichier1.txt fichier2.txt /app/
+
+
+
+# Attention
+#  Les arguments optionnels --chown et --chmod ne fonctionnent que sur des images de conteneurs Linux.
+
+
+
+# ADD fonctionne comme COPY. Il permet de copier un dossier et ou  des fichiers qui se trouvent dans notre machine locale vers le conteneur. La particularité de cette instruction est qu'elle permet d'intégrer des URL de fichiers distant et ou des archives qui seront décompressés à la volée et ajoutés au système de fichiers de l'image dans le répertoire de <desti>. 
+ADD [--chown=<user>:<group>] [--chmod=<perms>] ["<src>", ... "<dest>"]
+
+
+# RUN lance une ou plusieurs commandes Linux aux moments de la construction de l'image (e.g. pour installer des packages depuis une image de base). Chaque image selon la distribution a son propre gestionnaire de packer (e.g. apt pour ubuntu et debiant, yum pour CentOs et apk pour Alpine). 
+RUN apt update && apt install nginx
+RUN apk update && apk add nginx
+
+# Si plusieurs commandes s'enchainent, on peut utiliser le backslash \ pour poursuivre les commandes de l'instruction RUN sur la ligne suivante mais pour simplifier le debug, il vaut mieux utiliser plusieurs RUN successifs. 
+RUN apt update && \ 
+    apt install nginx
+
+# L'instruction RUN peut aussi être utiliser avec des variables définies avec ARG comme suite. 
+ARG prenom=John
+RUN echo $John
+ou 
+ARG PG_VERSION=9.3.4
+ENV PG_VERSION=${PG_VERSION}
+
+
+#  VOLUME permet de stocker des données de manière persistante sur l'hôte et de les rendre accessibles à plusieurs conteneurs
+VOLUME 	/volume_test
+
+
+# EXPOSE informe le moteur de conteneur (docker Engine) que le conteneur écoute sur les ports réseau spécifiés à l'exécution.le protocole peut être spécifier (TCP,UDP), TCP reste la valeurs par défaut. 
+
+EXPOSE 8000/TCP
+
+# Attention
+# L’instruction EXPOSE ne publie pas réellement le port. Il est utilisé à des fins de documentations. Il faudra le spécifier dans les arguments de la commande lançant l’image de conteneur. 
+
+
+
+# WORKDIR définit le répertoire de travail pour toutes les instructions qui la suivent dans le Dockerfile. Si il n'existe pas il sera crée. 
+
+WORKDIR /chemin/vers/workdir
+
+
+# CMD et ENTRYPOINT définissent les commandes qui seront exécutées au lancement de l'image de conteneur. 
+# La différence principale entre CMD et ENTRYPOINT  est que les commandes fournies par CMD peuvent être remplacés, ce qui n'est pas le cas de celle fournient par ENTRYPOINT sauf si elles sont forcés avec le bon argument dans la ligne de commande (CLI) dumoteur de conteneur. 
+
+CMD ["executable","param1","param2"]
+
+ENTRYPOINT ["executable","param1","param2"]
+
+ou exemple : 
+
+ENTRYPOINT ["/usr/sbin/apach2ctl", "-D", "FOREGROUND"]
+
+
+
+Parlons des commentaires. Ils contiennent des informations déstinées à l'humain (e.g. les développeurs) et commencent 
+toujours par le symbol dièse (#), repris des langages Python, Perl et Ruby. Ces lignes de commentaires sont supprimées
+durant le build process avant d'aller plus loin dans le process. Ces commentaires ne peuvent pas être sur la même 
+ligne que les instructions. 
+
+
