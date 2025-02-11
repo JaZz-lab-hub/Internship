@@ -26,7 +26,7 @@ ex:  	|   `___                    ________ 			__________
 Pour qu'un Dockerfile soit valide, il doit commencer  une instruction FROM.
 Elle définit l'image de base.
 
-# Doit apparaître comme la première instruction/ si on omet le tag, le générateur suppose que l'on veut récupérer l'image possédant le tag latest.
+# Cette image doit apparaître comme la première instruction/ si on omet le tag, le générateur suppose que l'on veut récupérer l'image possédant le tag latest.
  
 # FROM permet d'indiquer sur quelle image de base on construit l'image.
 FROM <image> [:<tag>] (Définit l'image de base)
@@ -118,8 +118,8 @@ EXPOSE 8000/TCP
 WORKDIR /chemin/vers/workdir
 
 
-# CMD et ENTRYPOINT définissent les commandes qui seront exécutées au lancement de l'image de conteneur. 
-# La différence principale entre CMD et ENTRYPOINT  est que les commandes fournies par CMD peuvent être remplacés, ce qui n'est pas le cas de celle fournient par ENTRYPOINT sauf si elles sont forcés avec le bon argument dans la ligne de commande (CLI) dumoteur de conteneur. 
+# CMD définit les arguments par défaut pour le lancement du conteneur
+# ENTRYPOINT définit la commande par défaut pour le lancement du conteneur 
 
 CMD ["executable","param1","param2"]
 

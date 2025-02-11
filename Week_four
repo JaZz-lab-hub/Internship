@@ -1,0 +1,131 @@
+############################################ Week four ##############################################
+
+Durant cette quatrième semaine, mon but est de comprendre le fonctionnement de l'outil de back-up Borg et pourvoir 
+l'utiliser de manière basique pour commencer. 
+
+Borg ou BorgBackup qu'est ce c'est ? 
+
+BorgBackup est un outil open source écrit principalement en Python et en C, permettant de faire des sauvegardes 
+par déduplication tout en facilitant la gestion des stockages de sauvegarde. 
+
+Les caractéristiques de BorgBackup
+**********************************
+
+ - La déduplication est une métode de sauvegarde qui consiste à découper chaque fichier en petits blocs (chunks), pour 
+   que seul les blocs modifier soit stockés. Ce qui permet l'économie d'espace "disque", surout si les sauvegardes 
+   sont quotidiennes avec peu de modifications entre chacune d'elles. 
+
+ - La compression des données améliore l'efficacité des sauvegardes en réduisant la quantité de données effectivement 
+   stockées et en diminuant la charge sur le système tout en optimisant les transferts de données. Donc sauvegarde plus ra   plus rapides et moindre coût en termes de ressources. La combinaison de la déduplicaiton et de la compression rend les    sauvegarde et le stockage rapide et léger. La compression de borg offre différents algorithmes (par défaut, lz4 qui offre
+   rapidité, ou d'autres comme zstd, zlib, lzma si l'on privilégie une meilleure compression au détriment de la vitesse).
+   Lorsque l'on parle de vitesse de compression et de taux de compression selon les différents algorithme, on fait référence
+   à rapidité avec laquelle un algorithme de compression peut transformer les données en une version compressée et inversement
+   ainsi que d'une mesure indiquant à quel point la taille des données a été réduite grâce à un algoritheme de compression. 
+
+ - Le chiffrement des sauvegardes permet de sécuriser les données (généralement en AES-256). Il se fait coté client, ce qui 
+   signifie que même en cas de support de sauvegarde compromis, les données restent protégées. 
+
+ - Les sauvegardes incrémentielles signifie que seules les modifications (les nouveaux chuncks) sont sauvegardées après la premi   ère sauvegarde complète, tout cela grâce à la déduplication. Les sauvegardes ultérieures sont beaucoup plus rapides et économ   es
+   en espace.
+
+ - L'archivage sous forme de "repositories" et "archives". Il est primordial de créer un dépôt (repository), qui est simplement    le dossier contenant toutes les sauvegardes et métadonnées. Chaque sauvegarde est appelée une archive et peut être nommée de    manière à intégrer la date, l'heure.
+
+
+Le fonctionnement de BorgBackup 
+*******************************
+
+ - L'initialisation du dépôt :
+ 
+   Avant une première sauvegarde, il est impératif de créer un dépôt (repository) où seront stockées toutes les archives. 
+   Exemple de commande permetant de créer un dépôt chiffré avec une clé générée automatiquement :
+ 
+  	$ borg init --encryption=repokey /home/djibril/backup-hdd/my-first-borg-repo
+
+		# --encryption indique la méthode de chiffrement 
+		# repokey la méthode utiliser indique que Borg génére une clef de chiffrement qui sera stockée dans le dépôt. 
+ 		  Cette clef de chiffement est elle même chiffrée à l'aide d'un mot de passe qui sera demandé par la suite, 
+		  il sera nécessaire pour effectuer des opérations sur le dépôt (sauvegarde, listing, accès aux données,...).
+  
+ - Création d'une archive :
+ 
+   Une fois le dépôt initialisé, il faut créer une archive avec la commande [borg create]. 
+   Exemple pour sauvegarder le dossier "mon-petit-file" : 
+   
+        $ borg create --list /home/djibril/backup-hdd/my-first-borg-repo::'mon-petit-file-{now}' \
+			/home/djibril/dossier0/
+
+		# l'option --list demande à Borg de lister les fichiers qu'il sauvegarde dans la console, sans celle-ci
+		  il n'écrit rien et on ne sait rien de la progression. 
+		# {now} est un placeholder, Borg remplace le placeholder par la date de la création. Il existe plusieurs 
+		  type de placeholder ({hostname} qui sera remplacé par ne nom de la machine, {user} pour le nom de 
+                  l'utilisateur. 
+
+
+ - Restauration et consultation :
+
+   Les archives étant déjà sauvegardés, il est maintenant possible de les consulter et les restaurer avec la commande 
+   [borg extract]. 
+   Il est important de mensionner que l'extraction se fait dans le dossier courant, il faut donc se placer au bon endroit 
+   pour le restaurer (à la racine pour que le chemin soit exactement le même que dans l'archive ou alors à l'emplacement 
+   d'origine).
+ 
+   Exemple pour restaurer l'archive créée précédemment : 
+   
+ 	$ borg extract --list /home/djibril/backup-hdd/my-first-borg-repo::Dossier0-2025-01-29T14:45:15
+		
+		# extract indique a Borg de restaurer des fichiers à partir d'une archive sauvegarder
+		# --list demande à Borg d'afficher la liste des fichiers extraits au fur et à mesure du process. Ce qui permet 			de suivre l'avancement de l'extraction en temps réel
+		# :: définissent la séparation entre le chemin du dépôt et le nom de l'archive à extraire 
+ 
+ - Suppression des archives : 
+   
+   On peut supprimer une archive sauvegarder avec la commande [borg delete]
+ 
+   Exemple de suppression d'une archive :
+	
+	$ borg delete /home/djibril/backup-hdd/my-first-borg-repo::Dossier0-2025-01-29T14:45:15
+ 	
+		# ici on supprime une archive
+	
+	$ borg delete /home/djibril/backup-hdd/my-first-repo::Dossier0-2025-01-*
+
+		# ici on supprime toutes les archives "Dossier0" de janvier 2025
+
+ - Mélange des archives : 
+   
+   Cette commande permet "d'élaguer" le dépôt de manière plus intelligente avec la commande [borg prune]
+   
+   Exemple : 
+    
+	$ borg prune --list -- prefix 'Dossier0-'\
+			    --keep-dayly '7'     \
+			    --keep-weekly '4'    \
+			    --keep-montly '12'   \
+
+		# borg prune demande à Borg de faire le mélange dans les archives 
+		# --list permet de lister les actions effectuées afin de suivre la progression
+		# --prefix permet d'indiquer qu'il ne faut traiter que les archives dont le nom commence par le préfixe indiqué 		(il peut être possible d'utiliser des placeholder comme {hostname}, {user} par exemple) 
+		# le paramètre 7 indique qu'on souhaite concerver 1 archive par jour durant 7 jours, puis 1 concerver par semain		e durant 4 semaines, puis 1 par mois durant 12 mois. Cela signifie que si l'on avait effectué une sauvegarde cha		que jour de l'année courante (2025) et que l'on exécute la commande ci-dessus le 31 décembre 2023, seules les ar		chives de ces dates seraient concervées : 31/01, 28/02, 31/03 etc de la même façon pour toute l'année.
+
+
+ - Libération de l'espace : 
+ 
+   Lorsque l'on utilise les commande borg delete et borg prune, les références aux archives demandées sont supprimés par Borg, m   ais il ne supprime pas les chunks n'étant plus utiles, ce qui signifie que l'epace disque occupé par le dépôt ne diminue pas.    
+   Il est possible de vérifier l'état de la mémoir avec la commande [du -sh]
+   
+   Exemple : 
+	
+	$ du -sh /home/djibril/backup-hdd/my-first-repo 
+		
+		# utiliser cette commande avant et après suppréssion via borg prune ou borg delete 
+
+   Pour liberer de l'espace disque, on peut faire appel à la commande [borg compact] 
+   
+   Exemple : 
+
+	$ borg compact --progress /home/djibril/backup-hdd/my-first-repo
+
+		# compact déclenche le processus de compaction du dépôt
+		# --progress affiche un indicateur de progression pendant l'exécution de la commande "compact"
+
+     
