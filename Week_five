@@ -1,0 +1,102 @@
+ 			Guide for Installing and Configuring Borgmatic
+
+Borgmatic is an automation and backup management tool that works with BorgBackup, as it relies on BorgBackup to perform backup operations. BorgBackup actually handles the backups and data management, while Borgmatic provides a simplified configuration interface and allows automating backup tasks with configuration files, scheduling options, etc. Therefore, it is necessary to install BorgBackup for the backups to work correctly."
+
+
+## 1) Install BorgBackup & Borgmatic 
+Update the package list and install the required tools:
+```bash
+sudo apt update
+sudo apt install borgbackup
+sudo apt install borgmatic
+```
+
+## 2) Configure Secure SSH Connection
+### Generate an SSH key pair
+```bash
+ssh-keygen -t ed25519
+```
+
+### Copy the public key to the remote server
+```bash
+ssh-copy-id -i ~/.ssh/id_ed25519.pub user@remote_server
+```
+
+### Connect to the remote server to verify the connection
+```bash
+ssh user@ipadress
+```
+
+## 3) Create a Repository on the Remote Server
+Create a folder on the remote server that will serve as the backup repository:
+```bash
+mkdir testbackup
+```
+
+## 4) Generate a Borgmatic Configuration File
+⚠️ Note: The official command may not work properly.  
+Use the following command to generate the configuration file:
+```bash
+generate-borgmatic-config -d /home/vagrant/.local/borgmatic/config.yaml
+```
+
+## 5) Modify the Borgmatic Configuration File
+Edit the file `/borgmatic/config.yaml` and configure the following parameters:
+
+### Define the source directories to backup
+```yaml
+source_directories:
+    - /home/vagrant/hello
+```
+
+### Define the location of the remote repository for backups
+```yaml
+repositories:
+    - path: ssh://root@65.108.83.69/./backuptest
+```
+
+
+### Configure the backup retention policy
+```yaml
+keep_hourly: 2
+keep_daily: 7
+keep_weekly: 4
+keep_monthly: 12
+keep_yearly: 10
+```
+
+## 6) Initialize a Borg Repository with Encryption
+Initializing the repository configures encryption with a key stored in the repository. This means that access will require a passphrase.
+
+### If the initialization is done directly on the remote server:
+```bash
+borg init --encryption=repokey backupborg
+```
+
+### If the initialization is done remotely:
+```bash
+borg init --encryption=repokey ssh://root@65.108.83.69/./backuptest
+```
+
+## 7) Configure a Cron Job for Automation
+### Edit the crontab
+```bash
+crontab -e
+```
+
+### Add the cron job (⚠️ Avoid using the passphrase in clear text in production)
+Example of a cron job that runs Borgmatic every hour at the 30th minute:
+```bash
+30 * * * * BORG_PASSPHRASE=hello /home/carl/.local/bin/borgmatic create --verbosity 1 --list --stats
+```
+
+🔴 Warning: Do not include the passphrase in clear text in a production environment. A better approach would be to use a **secure file** to store the passphrase.
+
+## Recap
+1. **Install** `borgbackup` and `borgmatic`
+2. **Configure Secure SSH**
+3. **Create the remote repository**
+4. **Generate the Borgmatic configuration file**
+5. **Customize `config.yaml`** (sources, repository, retention policy)
+6. **Initialize the repository with encryption**
+7. **Set up a cron job for automated backups**
