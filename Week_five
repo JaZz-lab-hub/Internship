@@ -24,7 +24,7 @@ ssh-copy-id -i ~/.ssh/id_ed25519.pub user@remote_server
 
 ### Connect to the remote server to verify the connection
 ```bash
-ssh user@ipadress
+ssh user@remote_server
 ```
 
 ## 3) Create a Repository on the Remote Server
@@ -52,7 +52,7 @@ source_directories:
 ### Define the location of the remote repository for backups
 ```yaml
 repositories:
-    - path: ssh://root@65.108.83.69/./backuptest
+    - path: ssh://user@remote_server/./backuptest
 ```
 
 
@@ -75,7 +75,7 @@ borg init --encryption=repokey backupborg
 
 ### If the initialization is done remotely:
 ```bash
-borg init --encryption=repokey ssh://root@65.108.83.69/./backuptest
+borg init --encryption=repokey ssh://user@remote_server/./backuptest
 ```
 
 ## 7) Configure a Cron Job for Automation
