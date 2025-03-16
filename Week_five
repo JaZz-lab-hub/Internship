@@ -37,7 +37,7 @@ mkdir testbackup
 ⚠️ Note: The official command may not work properly.  
 Use the following command to generate the configuration file:
 ```bash
-generate-borgmatic-config -d /home/vagrant/.local/borgmatic/config.yaml
+generate-borgmatic-config -d /home/vagrant/.config/borgmatic/config.yaml
 ```
 
 ## 5) Modify the Borgmatic Configuration File
@@ -88,6 +88,20 @@ crontab -e
 Example of a cron job that runs Borgmatic every hour at the 30th minute:
 ```bash
 30 * * * * BORG_PASSPHRASE=hello /home/carl/.local/bin/borgmatic create --verbosity 1 --list --stats
+```
+
+### This command allows real-time monitoring of the content of the Borg backup repository.
+watch command executes the specified command at regular intervals and the -n 1 option is used to set the interval to 1 second.
+```bash
+watch -n 1 "BORG_PASSPHRASE=test borg list ssh://root@65.108.83.69/./tstbckp"
+```
+
+### Create a repo to mount the archives 
+```bash
+sudo mkdir /mnt/montage 
+sudo chmod g+w /mnt/montage
+sudo chmod u+w /mnt/montage
+borg mount ssh://root@65.108.83.69/./tstbckp::serveur-DB-2025-03-16T22:10:02.693822 /mnt/montage
 ```
 
 🔴 Warning: Do not include the passphrase in clear text in a production environment. A better approach would be to use a **secure file** to store the passphrase.
