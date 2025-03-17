@@ -90,6 +90,12 @@ Example of a cron job that runs Borgmatic every hour at the 30th minute:
 30 * * * * BORG_PASSPHRASE=hello /home/carl/.local/bin/borgmatic create --verbosity 1 --list --stats
 ```
 
+### Before the creation of the job cron give the right to writeand read to the group
+```bash
+sudo chmod g+w /home/vagrant/.config/borgmatic/config.yaml 
+sudo chmod g+r /home/vagrant/.config/borgmatic/config.yaml 
+```
+
 ### This command allows real-time monitoring of the content of the Borg backup repository.
 watch command executes the specified command at regular intervals and the -n 1 option is used to set the interval to 1 second.
 ```bash
